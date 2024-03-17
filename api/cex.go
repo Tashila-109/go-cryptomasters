@@ -2,6 +2,7 @@ package api
 
 import (
 	"cryptomasters/go/crypto/datatypes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -22,9 +23,12 @@ func GetRate(currency string) (*datatypes.Rate, error) {
 		if err != nil {
 			return nil, err
 		}
+		var response CEXResponse
+		err = json.Unmarshal(bodyBytes, &response)
+		if err != nil {
+			return nil, err
+		}
 
-		json := string(bodyBytes)
-		fmt.Println(json)
 	} else {
 		return nil, fmt.Errorf("status code received: %v", res.StatusCode)
 	}
