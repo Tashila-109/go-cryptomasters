@@ -3,16 +3,26 @@ package main
 import (
 	"cryptomasters/go/crypto/api"
 	"fmt"
-	"time"
+	"sync"
 )
 
+// main go routine
 func main() {
-	go getCurrencyData("BTC")
-	go getCurrencyData("ETH")
-	go getCurrencyData("BCH")
-	time.Sleep(time.Second * 5)
+	currencies := []string{"BTC", "ETH", "BCH"}
+	var wg sync.WaitGroup
+
+	for _, currency := range currencies {
+		wg.Add(1)
+		go func(currencyCode string) {
+			getCurrencyData(currencyCode)
+			wg.Done()
+		}(currency)
+	}
+
+	wg.Wait()
 }
 
+// new go routine
 func getCurrencyData(currency string) {
 	rate, err := api.GetRate(currency)
 
